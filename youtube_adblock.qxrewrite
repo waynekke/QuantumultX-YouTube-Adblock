@@ -1,0 +1,15 @@
+#!name=YouTube去广告
+#!desc=针对YouTube移动网页版(m.youtube.com)的广告跳过规则，拦截pagead请求并修改player响应体移除广告心跳，基于实际抓包数据编写。
+#!author=waynekke
+#!homepage=https://github.com/waynekke/QuantumultX-YouTube-Adblock
+
+hostname = m.youtube.com, www.youtube.com
+
+# 屏蔽 Google AdSense 广告请求（adview / interaction / viewthroughconversion）
+^https?:\/\/www\.youtube\.com\/pagead\/ url reject-200
+
+# 屏蔽广告统计上报接口
+^https?:\/\/m\.youtube\.com\/api\/stats\/ads url reject-200
+
+# 修改 player 接口响应体，移除 adBreakHeartbeatParams 阻止播放器加载广告
+^https?:\/\/m\.youtube\.com\/youtubei\/v1\/player url script-response-body https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/youtube_no_ads.js
