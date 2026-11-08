@@ -1,11 +1,10 @@
 {
   "filter_remote": [
-    "https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/%E5%8E%BB%E5%B9%BF%E5%91%8A30/12306-direct.list, tag=去广告30-12306直连例外, update-interval=172800, opt-parser=false, enabled=true",
     "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list, tag=去广告30-黑矩阵精简广告分流, force-policy=reject, update-interval=172800, opt-parser=false, enabled=true"
   ],
   "rewrite_remote": [
     "https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/youtube_adblock.qxrewrite, tag=去广告30-YouTube广告重写, update-interval=172800, opt-parser=true, enabled=true",
     "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rewrite/QuantumultX/AdvertisingLite/AdvertisingLite.conf, tag=去广告30-黑矩阵精简广告重写, update-interval=172800, opt-parser=true, enabled=true",
-    "https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/%E5%8E%BB%E5%B9%BF%E5%91%8A30/%E5%8E%BB%E5%B9%BF%E5%91%8A30.qxrewrite, tag=去广告30-12306与公众号广告重写, update-interval=172800, opt-parser=true, enabled=true"
+    "https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/%E5%8E%BB%E5%B9%BF%E5%91%8A30/%E5%8E%BB%E5%B9%BF%E5%91%8A30.qxrewrite, tag=去广告30-公众号广告重写, update-interval=172800, opt-parser=true, enabled=true"
   ]
 }
