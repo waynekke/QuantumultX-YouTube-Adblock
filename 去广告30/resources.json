@@ -1,6 +1,6 @@
 {
   "filter_remote": [
-    "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list, tag=去广告30-黑矩阵精简广告分流, force-policy=reject, update-interval=172800, opt-parser=false, enabled=true"
+    "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/master/rule/QuantumultX/AdvertisingLite/AdvertisingLite.list#out=12306, tag=去广告30-黑矩阵精简广告分流, force-policy=reject, update-interval=172800, opt-parser=true, enabled=true"
   ],
   "rewrite_remote": [
     "https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/youtube_adblock.qxrewrite, tag=去广告30-YouTube广告重写, update-interval=172800, opt-parser=true, enabled=true",
