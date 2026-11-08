@@ -1,7 +1,0 @@
-#!name=去广告30
-#!desc=仅处理微信公众号文章广告接口。
-
-hostname = mp.weixin.qq.com
-
-# 微信公众号文章广告接口
-^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad url script-response-body https://raw.githubusercontent.com/NobyDa/Script/0b8d083d444f4476700cb9d5d059c07b42da85eb/QuantumultX/File/Wechat.js
