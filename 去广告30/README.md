@@ -1,10 +1,10 @@
 # 去广告30
 
-这是从你提供的圈叉配置中整理出的广告专用资源包，使用圈叉可导入的远程分流与重写格式。当前包含 1 条广告分流订阅和 3 条广告重写资源。
+这是从你提供的圈叉配置中整理出的广告专用资源包，使用圈叉可导入的远程分流与重写格式。包含 1 条广告分流订阅和 3 条广告重写资源。
 
 ## 一键加入圈叉
 
-[点此将去广告30加入圈叉](https://quantumult.app/x/open-app/add-resource?remote-resource=%7B%22filter_remote%22%3A%5B%22https%3A%2F%2Fraw.githubusercontent.com%2Fblackmatrix7%2Fios_rule_script%2Fmaster%2Frule%2FQuantumultX%2FAdvertisingLite%2FAdvertisingLite.list%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-%E9%BB%91%E7%9F%A9%E9%98%B5%E7%B2%BE%E7%AE%80%E5%B9%BF%E5%91%8A%E5%88%86%E6%B5%81%2C%20force-policy%3Dreject%2C%20update-interval%3D172800%2C%20opt-parser%3Dfalse%2C%20enabled%3Dtrue%22%5D%2C%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fraw.githubusercontent.com%2Fwaynekke%2FQuantumultX-YouTube-Adblock%2Fmain%2Fyoutube_adblock.qxrewrite%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-YouTube%E5%B9%BF%E5%91%8A%E9%87%8D%E5%86%99%2C%20update-interval%3D172800%2C%20opt-parser%3Dtrue%2C%20enabled%3Dtrue%22%2C%22https%3A%2F%2Fraw.githubusercontent.com%2Fblackmatrix7%2Fios_rule_script%2Fmaster%2Frewrite%2FQuantumultX%2FAdvertisingLite%2FAdvertisingLite.conf%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-%E9%BB%91%E7%9F%A9%E9%98%B5%E7%B2%BE%E7%AE%80%E5%B9%BF%E5%91%8A%E9%87%8D%E5%86%99%2C%20update-interval%3D172800%2C%20opt-parser%3Dtrue%2C%20enabled%3Dtrue%22%2C%22https%3A%2F%2Fraw.githubusercontent.com%2Fwaynekke%2FQuantumultX-YouTube-Adblock%2Fmain%2F%25E5%258E%25BB%25E5%25B9%25BF%25E5%2591%258A30%2F%25E5%258E%25BB%25E5%25B9%25BF%25E5%2591%258A30.qxrewrite%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-%E5%85%AC%E4%BC%97%E5%8F%B7%E5%B9%BF%E5%91%8A%E9%87%8D%E5%86%99%2C%20update-interval%3D172800%2C%20opt-parser%3Dtrue%2C%20enabled%3Dtrue%22%5D%7D)
+[点此将去广告30加入圈叉](https://quantumult.app/x/open-app/add-resource?remote-resource=%7B%22filter_remote%22%3A%5B%22https%3A%2F%2Fraw.githubusercontent.com%2Fblackmatrix7%2Fios_rule_script%2Fmaster%2Frule%2FQuantumultX%2FAdvertisingLite%2FAdvertisingLite.list%23out%3D12306%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-%E9%BB%91%E7%9F%A9%E9%98%B5%E7%B2%BE%E7%AE%80%E5%B9%BF%E5%91%8A%E5%88%86%E6%B5%81%2C%20force-policy%3Dreject%2C%20update-interval%3D172800%2C%20opt-parser%3Dtrue%2C%20enabled%3Dtrue%22%5D%2C%22rewrite_remote%22%3A%5B%22https%3A%2F%2Fraw.githubusercontent.com%2Fwaynekke%2FQuantumultX-YouTube-Adblock%2Fmain%2Fyoutube_adblock.qxrewrite%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-YouTube%E5%B9%BF%E5%91%8A%E9%87%8D%E5%86%99%2C%20update-interval%3D172800%2C%20opt-parser%3Dtrue%2C%20enabled%3Dtrue%22%2C%22https%3A%2F%2Fraw.githubusercontent.com%2Fblackmatrix7%2Fios_rule_script%2Fmaster%2Frewrite%2FQuantumultX%2FAdvertisingLite%2FAdvertisingLite.conf%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-%E9%BB%91%E7%9F%A9%E9%98%B5%E7%B2%BE%E7%AE%80%E5%B9%BF%E5%91%8A%E9%87%8D%E5%86%99%2C%20update-interval%3D172800%2C%20opt-parser%3Dtrue%2C%20enabled%3Dtrue%22%2C%22https%3A%2F%2Fraw.githubusercontent.com%2Fwaynekke%2FQuantumultX-YouTube-Adblock%2Fmain%2F%25E5%258E%25BB%25E5%25B9%25BF%25E5%2591%258A30%2F%25E5%258E%25BB%25E5%25B9%25BF%25E5%2591%258A30.qxrewrite%2C%20tag%3D%E5%8E%BB%E5%B9%BF%E5%91%8A30-%E5%85%AC%E4%BC%97%E5%8F%B7%E5%B9%BF%E5%91%8A%E9%87%8D%E5%86%99%2C%20update-interval%3D172800%2C%20opt-parser%3Dtrue%2C%20enabled%3Dtrue%22%5D%7D)
 
 圈叉会通过“添加资源”把这些条目加入现有配置，不会替换其他配置。导入后可在远程资源列表中查看、更新或停用每项规则。
 
@@ -12,7 +12,7 @@
 
 | 类型 | 资源 | 作用 |
 |---|---|---|
-| 广告分流 | 黑矩阵精简广告列表 | 按广告域名拦截请求 |
+| 广告分流 | 黑矩阵精简广告列表 | 按广告域名拦截请求，并排除上游列表中匹配 12306 的规则 |
 | 广告重写 | YouTube（优兔）专用规则 | 处理视频平台广告请求 |
 | 广告重写 | 黑矩阵精简广告重写 | 处理应用广告接口 |
 | 广告重写 | 微信公众号 | 修改公众号文章广告接口的响应内容 |
@@ -21,7 +21,11 @@
 
 只保留广告分流与广告重写内容，没有把隐私保护专用规则并入新包。原配置中的 Limbo 列表合并了广告、隐私追踪等多个来源；anti-AD（反广告）项目也说明会屏蔽部分日志收集与统计域名，因此这两类混合列表没有纳入。广告规则本身仍可能拦截广告展示统计请求。
 
+黑矩阵分流链接使用圈叉资源解析器的排除参数过滤掉上游列表中匹配 12306 的规则；新包不包含 12306 的直连例外或重写模块。
+
 如果原配置仍启用了旧的 Limbo、anti-AD、anti-ad.net 或 NobyDa 订阅，添加资源不会自动移除它们；为了只使用这个广告包并避免重复规则，可在圈叉中停用旧订阅。相同来源的旧黑矩阵或 YouTube 资源也建议只保留一份。
+
+YouTubeAds 的重复条目还带有画中画、后台播放或自动翻译等额外功能；lhie1 重写混合多类规则，所以没有整份纳入，只留下可单独识别的广告处理内容。`udp_drop_list=443` 会影响全局 UDP 443 流量，也没有纳入。
 
 ## 使用说明
 
