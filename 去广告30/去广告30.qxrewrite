@@ -1,0 +1,10 @@
+#!name=去广告30
+#!desc=只处理广告相关请求，包含铁路12306开屏广告与微信公众号文章广告接口。
+
+hostname = ad.12306.cn, mp.weixin.qq.com
+
+# 铁路12306开屏广告列表，只改写广告接口返回
+^https?:\/\/ad\.12306\.cn\/ad\/ser\/getAdList url script-analyze-echo-response https://raw.githubusercontent.com/ddgksf2013/Scripts/203e38b7b8dd1082ececbd17de3aeb587ac2826c/12306.js
+
+# 微信公众号文章广告接口
+^https?:\/\/mp\.weixin\.qq\.com\/mp\/getappmsgad url script-response-body https://raw.githubusercontent.com/NobyDa/Script/0b8d083d444f4476700cb9d5d059c07b42da85eb/QuantumultX/File/Wechat.js
