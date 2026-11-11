@@ -2,8 +2,6 @@
 #!desc=清理YouTube移动网页播放器响应中的广告字段，并拦截明确的广告请求；不适用于YouTube原生应用
 #!author=waynekke
 #!homepage=https://github.com/waynekke/QuantumultX-YouTube-Adblock
-#!version=1.1.0
-#!update-interval=86400
 
 hostname = m.youtube.com, www.youtube.com, s.youtube.com
 
