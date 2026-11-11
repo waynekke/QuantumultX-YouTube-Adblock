@@ -33,7 +33,10 @@
     ]);
 
     const listItemMetadata = new Set(["trackingParams", "clickTrackingParams", "loggingDirectives"]);
-    const initialAssignment = /^\s*(?:(?:(?:var|let|const)\s+|window\s*\.\s*)?(ytInitialData|ytInitialPlayerResponse)|window\s*\[\s*(["'])(ytInitialData|ytInitialPlayerResponse)\2\s*\])\s*=\s*(?=\{)/;
+    const initialAssignment = /^(?:(?:(?:var|let|const)\s+|window\s*\.\s*)?(ytInitialData|ytInitialPlayerResponse|playerResponse)|window\s*\[\s*(["'])(ytInitialData|ytInitialPlayerResponse|playerResponse)\2\s*\])\s*=\s*(?=\{)/;
+    const scriptTrivia = /^(?:\s|\/\/[^\r\n]*(?:\r\n?|\n|$)|\/\*[\s\S]*?\*\/)*/;
+    const rawTextTags = new Set(["script", "style", "title", "textarea", "iframe", "xmp", "noembed", "noframes", "noscript"]);
+    const inertTags = new Set(["template", "svg", "math"]);
 
     function isObject(value) {
         return value !== null && typeof value === "object";
@@ -63,10 +66,10 @@
         return adRenderers.has(type);
     }
 
-    function removeAds(payload, playerPayload) {
+    function removeAds(payload, playerPayload, reelSequence) {
         let changed = false;
 
-        function visit(value, inPlayer, reelEntries) {
+        function visit(value, inPlayer, inReelSequence) {
             if (!isObject(value)) {
                 return;
             }
@@ -74,16 +77,25 @@
             if (Array.isArray(value)) {
                 let kept = 0;
                 for (const item of value) {
-                    const reelAd = reelEntries && item?.command?.reelWatchEndpoint?.adClientParams?.isAd === true;
-                    if (reelAd || isAdCard(item)) {
+                    if (isAdCard(item)) {
                         changed = true;
                         continue;
                     }
-                    visit(item, inPlayer, false);
+                    visit(item, inPlayer, inReelSequence);
                     value[kept++] = item;
                 }
                 value.length = kept;
                 return;
+            }
+
+            if (inReelSequence && Array.isArray(value.entries)) {
+                const entries = value.entries.filter(function (item) {
+                    return item?.command?.reelWatchEndpoint?.adClientParams?.isAd !== true;
+                });
+                if (entries.length !== value.entries.length) {
+                    value.entries = entries;
+                    changed = true;
+                }
             }
 
             // 混合项保留普通字段。纯广告项在上面的列表处理中整项移除。
@@ -93,11 +105,11 @@
                     changed = true;
                     continue;
                 }
-                visit(value[key], inPlayer || key === "playerResponse", key === "entries");
+                visit(value[key], inPlayer || key === "playerResponse", key === "reelWatchSequenceResponse");
             }
         }
 
-        visit(payload, playerPayload, false);
+        visit(payload, playerPayload, reelSequence);
         return changed;
     }
 
@@ -119,7 +131,8 @@
 
             const playerPayload = endpoint === "player" || endpoint === "get_watch"
                 || endpoint === "reel/reel_item_watch";
-            return removeAds(data, playerPayload) ? JSON.stringify(data) : source;
+            const reelSequence = endpoint === "reel/reel_watch_sequence" || endpoint === "shorts-page";
+            return removeAds(data, playerPayload, reelSequence) ? JSON.stringify(data) : source;
         } catch (_) {
             return source;
         }
@@ -164,13 +177,18 @@
         return -1;
     }
 
-    function rewriteInlineScript(script) {
-        let offset = 0;
+    function rewriteInlineScript(script, pageEndpoint) {
+        let offset = scriptTrivia.exec(script)[0].length;
+        const directive = /^(?:"use strict"|'use strict')\s*;/.exec(script.slice(offset));
+        if (directive) {
+            offset += directive[0].length;
+        }
         let copied = 0;
         let result = "";
 
-        // 只识别脚本开头的已知赋值，并允许这些赋值紧接在一起。
+        // 只处理脚本开头连续出现的已知赋值，保留注释和其余代码。
         while (offset < script.length) {
+            offset += scriptTrivia.exec(script.slice(offset))[0].length;
             const assignment = initialAssignment.exec(script.slice(offset));
             if (!assignment) {
                 break;
@@ -187,7 +205,7 @@
 
             const name = assignment[1] || assignment[3];
             const source = script.slice(start, end);
-            const updated = rewriteEmbeddedJson(source, name === "ytInitialPlayerResponse" ? "player" : "page");
+            const updated = rewriteEmbeddedJson(source, name === "ytInitialData" ? pageEndpoint : "player");
             if (updated !== source) {
                 result += script.slice(copied, start) + updated;
                 copied = end;
@@ -198,31 +216,160 @@
         return copied ? result + script.slice(copied) : script;
     }
 
-    function rewriteHtml(body) {
-        const tags = /<!--[\s\S]*?-->|(<script(?=[\s>])((?:[^<>"']|"[^"]*"|'[^']*')*)>)([\s\S]*?)(<\/script\s*>)/gi;
-        return body.replace(tags, function (tag, open, attributes, script, close) {
-            if (!open) {
-                return tag;
+    function scanTag(body, start) {
+        let quote = "";
+        let waitingForValue = false;
+        let unquotedValue = false;
+        for (let index = start; index < body.length; index++) {
+            const char = body[index];
+            if (quote) {
+                if (char === quote) {
+                    quote = "";
+                }
+                continue;
+            }
+            if (char === ">") {
+                return {
+                    end: index + 1,
+                    selfClosing: body[index - 1] === "/" && !unquotedValue && !waitingForValue
+                };
+            }
+            if (/[\t\n\f\r ]/.test(char)) {
+                unquotedValue = false;
+            } else if (waitingForValue) {
+                waitingForValue = false;
+                if (char === '"' || char === "'") {
+                    quote = char;
+                } else {
+                    unquotedValue = true;
+                }
+            } else if (!unquotedValue && char === "=") {
+                waitingForValue = true;
+            }
+        }
+        return null;
+    }
+
+    function declarationEnd(body, marker, start) {
+        if (marker === "<!--") {
+            if (body[start] === ">") {
+                return start + 1;
+            }
+            if (body.startsWith("->", start)) {
+                return start + 2;
+            }
+            const commentEnd = /--!?>/g;
+            commentEnd.lastIndex = start;
+            return commentEnd.exec(body) ? commentEnd.lastIndex : -1;
+        }
+        const ending = marker.toUpperCase() === "<![CDATA[" ? "]]>" : ">";
+        const end = body.indexOf(ending, start);
+        return end < 0 ? -1 : end + ending.length;
+    }
+
+    function rewriteScript(attributes, script, pageEndpoint) {
+        const attribute = /([^\t\n\f\r =/"'<>]+)(?:[\t\n\f\r ]*=[\t\n\f\r ]*(?:"([^"]*)"|'([^']*)'|([^\t\n\f\r >]+)))?/g;
+        let id;
+        let type;
+        let match;
+        while ((match = attribute.exec(attributes))) {
+            const name = match[1].toLowerCase();
+            const value = match[2] ?? match[3] ?? match[4] ?? "";
+            if (name === "src") {
+                return script;
+            }
+            if (name === "id" && id === undefined) {
+                id = value;
+            }
+            if (name === "type" && type === undefined) {
+                type = value.trim().toLowerCase();
+            }
+        }
+
+        if (id === "yt-initial-data" && (!type || /^application\/json(?:\s*;|$)/.test(type))) {
+            return rewriteEmbeddedJson(script, pageEndpoint);
+        }
+        if (type && type !== "module" && !/^(?:text|application)\/(?:java|ecma)script$/.test(type)) {
+            return script;
+        }
+        return rewriteInlineScript(script, pageEndpoint);
+    }
+
+    function rewriteHtml(body, pageEndpoint) {
+        if (!/ytInitialData|ytInitialPlayerResponse|playerResponse|yt-initial-data/.test(body)) {
+            return body;
+        }
+
+        const tags = /<!--|<!\[CDATA\[|<!|<\?|<(\/?)([a-z][^\t\n\f\r />]*)/gi;
+        const inert = [];
+        const chunks = [];
+        let copied = 0;
+        let marker;
+        while ((marker = tags.exec(body))) {
+            const start = tags.lastIndex;
+            if (!marker[2]) {
+                const end = declarationEnd(body, marker[0], start);
+                if (end < 0) {
+                    break;
+                }
+                tags.lastIndex = end;
+                continue;
             }
 
-            const attribute = /\s+([^\s=/"'<>]+)(?:\s*=\s*(?:"([^"]*)"|'([^']*)'|([^\s="'<>]+)))?/g;
-            let id;
-            let match;
-            while ((match = attribute.exec(attributes))) {
-                const name = match[1].toLowerCase();
-                if (name === "src") {
-                    return tag;
+            const tag = scanTag(body, start);
+            if (!tag) {
+                break;
+            }
+            const end = tag.end;
+            tags.lastIndex = end;
+            const name = marker[2].toLowerCase();
+            if (inertTags.has(name)) {
+                if (marker[1]) {
+                    if (inert[inert.length - 1] === name) {
+                        inert.pop();
+                    }
+                } else if (name === "template" || !tag.selfClosing) {
+                    inert.push(name);
                 }
-                if (name === "id" && id === undefined) {
-                    id = match[2] ?? match[3] ?? match[4];
-                }
+                continue;
+            }
+            if (marker[1]) {
+                continue;
+            }
+            if (name === "plaintext") {
+                break;
+            }
+            if (!rawTextTags.has(name)) {
+                continue;
             }
 
-            const updated = id === "yt-initial-data"
-                ? rewriteEmbeddedJson(script, "page")
-                : rewriteInlineScript(script);
-            return updated === script ? tag : open + updated + close;
-        });
+            const closingTag = new RegExp("</" + name + "(?=[\\t\\n\\f\\r />])", "ig");
+            closingTag.lastIndex = end;
+            const close = closingTag.exec(body);
+            const closeTag = close && scanTag(body, closingTag.lastIndex);
+            if (!closeTag) {
+                break;
+            }
+            tags.lastIndex = closeTag.end;
+            if (name !== "script") {
+                continue;
+            }
+
+            const script = body.slice(end, close.index);
+            // 旧式脚本转义会改变结束标签的含义，遇到这种写法时停止扫描。
+            if (/<!--[\s\S]*?<script(?=[\t\n\f\r />])/i.test(script)) {
+                break;
+            }
+            if (inert.length !== 0) {
+                continue;
+            }
+            const updated = rewriteScript(body.slice(start, end - 1), script, pageEndpoint);
+            if (updated !== script) {
+                chunks.push(body.slice(copied, end), updated);
+                copied = close.index;
+            }
+        }
+        return copied ? chunks.join("") + body.slice(copied) : body;
     }
 
     function rewriteResponse(url, response) {
@@ -242,7 +389,8 @@
             return rewriteApiBody(body, api[1]);
         }
         if (/^\/(?:(?:watch|results|playlist|shorts\/[A-Za-z0-9_-]+)\/?)?$/.test(path)) {
-            return /^\s*</.test(body) ? rewriteHtml(body) : rewriteApiBody(body, "page");
+            const pageEndpoint = path.startsWith("/shorts/") ? "shorts-page" : "page";
+            return /^\s*</.test(body) ? rewriteHtml(body, pageEndpoint) : rewriteApiBody(body, pageEndpoint);
         }
         return body;
     }
