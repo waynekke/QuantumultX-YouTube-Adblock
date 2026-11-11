@@ -1,35 +1,29 @@
-# Quantumult X（圈 X）YouTube（油管）移动网页去广告
+# 圈 X 的油管网页去广告
 
-这是给 Quantumult X（圈 X）使用的远程重写资源，目标是通过 Safari（苹果浏览器）或其他浏览器访问的 YouTube（油管）移动网页。它不覆盖 YouTube（油管）原生应用、电视客户端或 YouTube Music（油管音乐）。
+这条远程重写资源适用于在苹果浏览器等浏览器打开的 YouTube（油管）网页，覆盖 `m.youtube.com` 和 `www.youtube.com`。
 
-## 当前处理范围
+## 覆盖范围
 
-- 在 /youtubei/v1/player 的 JSON（结构化数据格式）响应中，清理 adPlacements（广告位）、adSlots（广告槽）、playerAds（播放器广告）、adBreaks（广告时段）、adBreakHeartbeatParams（广告心跳参数）等字段。
-- 拦截 YouTube（油管）明确用于广告加载、广告追踪和广告统计的接口。
-- 脚本只在本地处理播放器响应，不向第三方服务发送响应内容或账号数据。
-- 如果响应格式异常、不是预期的播放器 JSON（结构化数据格式），脚本会原样放行，避免因解析失败破坏播放。
+| 使用场景 | 处理内容 |
+| --- | --- |
+| 直接打开首页、视频、搜索、播放列表或短视频网页 | 清理网页内嵌的初始播放器数据及广告卡片 |
+| 从推荐点开视频或预加载下一个视频 | 清理 `player`、`get_watch`、`resolve_url` 中的播放器广告字段 |
+| 刷新首页、继续滚动或搜索 | 从 `browse`、`next`、`search` 的列表里移除带明确广告类型的卡片，保留普通内容及分页项 |
+| 打开或滑动短视频 | 清理短视频播放响应，并移除序列中明确标记为广告的条目 |
 
-## 安装与使用
+重写还会拦截广告加载、广告追踪及广告统计请求。脚本在圈 X 本地处理响应，解析失败时沿用原响应。
 
-1. 在 Quantumult X（圈 X）的重写资源中添加以下订阅地址：
+## 安装与更新
 
-   https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/refs/heads/main/youtube_adblock.qxrewrite
+1. 已订阅的用户在圈 X 手动更新这条资源。首次使用时，在「重写 → 资源」添加[订阅地址](https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/refs/heads/main/youtube_adblock.qxrewrite)。
+2. 开启重写与中间人解密，确认 `m.youtube.com`、`www.youtube.com`、`s.youtube.com` 已加入解密范围。首次使用中间人解密时，按圈 X 的说明安装并信任证书。
 
-2. 开启重写，并确保 YouTube（油管）网页使用的 m.youtube.com、www.youtube.com、s.youtube.com 已纳入 Quantumult X（圈 X）的 HTTPS（安全网页传输协议）中间人解密范围。
-3. 首次使用 HTTPS（安全网页传输协议）中间人解密时，按 Quantumult X（圈 X）的说明安装并信任证书，然后更新重写资源。
-
-## 适用范围与限制
-
-- 规则针对 YouTube（油管）移动网页的播放器 JSON（结构化数据格式）接口，不会拦截 googlevideo.com（Google 视频流域名），也不会修改原生应用的二进制响应。
-- YouTube（油管）会调整接口和广告投放方式，不能保证所有广告类型、所有地区和所有版本始终都能拦截。
-- 如果视频异常，先关闭这条重写资源确认是否恢复；若确认与规则有关，可反馈 Quantumult X（圈 X）版本、浏览器类型、出现问题的页面及脱敏后的请求路径。不要公开 Cookie（网站访问凭据）、授权令牌或完整播放链接。
+覆盖效果取决于油管向当前浏览器及账号下发的广告形式。服务端安排的插播与等待时段需要在设备上确认。若出现播放异常，可暂时关闭这条重写，再打开同一页面对比。反馈时请提供圈 X 版本、浏览器类型及脱敏后的请求路径。
 
 ## 资料来源
 
-- [Quantumult X（圈 X）官方重写示例](https://github.com/crossutility/Quantumult-X/blob/master/rewrite.md)：确认响应体脚本的处理方式。
-- [Quantumult X（圈 X）官方配置示例](https://github.com/crossutility/Quantumult-X/blob/master/sample.conf)：确认脚本对象与 HTTPS（安全网页传输协议）中间人主机名设置。
-- [ddgksf2013 YouTube（油管）重写规则](https://github.com/ddgksf2013/Rewrite/blob/master/AdBlock/YoutubeAds.conf)：参考广告统计、广告追踪接口以及播放器响应字段。
-- [Ender-Wang YouTube（油管）重写项目](https://github.com/Ender-Wang/YouTubeAds-PiP-BackgroundPlay)：对照 YouTube（油管）播放接口规则。
-- [Maasea YouTube（油管）模块讨论区](https://github.com/Maasea/sgmodule/issues)：查看接口变动、规则失效及播放异常的维护者与用户报告。
-
-原生应用规则涉及不同的二进制接口与视频流域名，兼容方式和隐私边界不同，因此没有并入本网页资源。
+- 圈 X 的响应体脚本及中间人解密设置。[官方重写示例](https://github.com/crossutility/Quantumult-X/blob/master/rewrite.md) · [官方配置示例](https://github.com/crossutility/Quantumult-X/blob/master/sample.conf)
+- 播放器、短视频序列及预加载接口中的广告字段。[uBlock Origin（浏览器广告拦截器）过滤规则](https://github.com/uBlockOrigin/uAssets/blob/master/filters/filters.txt) · [快速修正规则](https://github.com/uBlockOrigin/uAssets/blob/master/filters/quick-fixes.txt)
+- 网页内嵌数据的格式。[yt-dlp（视频解析工具）网页解析源码](https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/extractor/youtube/_base.py)
+- 广告卡片类型。[YouTube.js（油管接口客户端）解析源码](https://github.com/LuanRT/YouTube.js/blob/main/src/parser/parser.ts) · [网页去广告实现](https://gist.github.com/oiiogong/3b2f171141b54027e5db9a543b09b194)
+- 广告统计及广告追踪路径。[ddgksf2013 重写规则](https://github.com/ddgksf2013/Rewrite/blob/master/AdBlock/YoutubeAds.conf) · [Ender-Wang 重写项目](https://github.com/Ender-Wang/YouTubeAds-PiP-BackgroundPlay)

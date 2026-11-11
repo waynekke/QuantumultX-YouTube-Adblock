@@ -1,12 +1,15 @@
 #!name=YouTube移动网页去广告
-#!desc=清理YouTube移动网页播放器响应中的广告字段，并拦截明确的广告请求；不适用于YouTube原生应用
+#!desc=清理油管网页首屏、播放器和列表中的广告数据，拦截明确的广告请求
 #!author=waynekke
 #!homepage=https://github.com/waynekke/QuantumultX-YouTube-Adblock
 
 hostname = m.youtube.com, www.youtube.com, s.youtube.com
 
-# YouTube移动网页播放器JSON响应：仅处理player接口
-^https?:\/\/(m|www)\.youtube\.com\/youtubei\/v1\/player(?:\?.*)?$ url script-response-body https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/youtube_no_ads.js
+# 网页播放器、预加载、列表与短视频接口
+^https?:\/\/(?:m|www)\.youtube\.com\/youtubei\/v1\/(?:player|get_watch|resolve_url|browse|next|search|reel\/(?:reel_item_watch|reel_watch_sequence))\/?(?:\?.*)?$ url script-response-body https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/youtube_no_ads.js?v=2
+
+# 浏览器首次打开首页、视频、搜索、播放列表或短视频页面时的内嵌数据
+^https?:\/\/(?:m|www)\.youtube\.com\/(?:(?:watch|results|playlist|shorts\/[A-Za-z0-9_-]+)\/?)?(?:\?.*)?$ url script-response-body https://raw.githubusercontent.com/waynekke/QuantumultX-YouTube-Adblock/main/youtube_no_ads.js?v=2
 
 # 明确的广告加载与追踪接口
 ^https?:\/\/(m|www|s)\.youtube\.com\/(pagead|ptracking)(\/|\?|$) url reject-200
